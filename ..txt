@@ -1,0 +1,314 @@
+System.out.println("PRIMOS");
+
+        mostrarPrimos(10, 25);
+        System.out.println();
+        System.out.println(cantidadPrimos(10, 25));
+        System.out.println(siguientePrimo(24));
+        System.out.println(anteriorPrimo(24));
+        System.out.println(iesimoPrimo(10));
+        System.out.print("factores primos: \n");
+        mostrarFactoresPrimos(360);
+        System.out.println("");
+        System.out.println(primo(17));
+
+
+
+        //cadenas
+        String s1 = "aA1bB22cc";
+        String s2 = "cBa2";
+        System.out.println(frecuencia(s1, 'c'));
+        System.out.println(estanTodos(s2, s1));
+        System.out.println(mismosChar("abca", "caba"));
+        System.out.println(palindrome("reconocer"));
+        System.out.println(existeVocal("rhythm"));
+        System.out.println(frecuenciaDigitos(s1));
+        System.out.println(ordenado("abbcdd"));
+        
+        
+        //ciclos anidados tablas
+        System.out.println("tabla(3):");
+        tabla(3);
+
+        System.out.println("\ntablaSinRepeticion(3):");
+        tablaSinRepeticion(3);
+
+        System.out.println("\ntablaParImpar(4):");
+        tablaParImpar(4);
+
+        System.out.println("\ntablaPares(6):");
+        tablaPares(6);
+
+        System.out.println("\ntablaCoprimos(4):");
+        tablaCoprimos(4);
+
+        System.out.println("\ntabla3Factores(3):");
+        tabla3Factores(3);
+
+        System.out.println("\ntablaSinRepeticion3(3):");
+        tablaSinRepeticion3(3);
+        
+        tablaResultadoIgualA(10, 24);     // parejas cuyo producto es 24
+        tablaProductoMultiploDe(8, 6);    // productos múltiplos de 6
+        //tablaMismoResiduoMod(10, 4);      // (i % 4) == (j % 4)
+        //tablaUnoMultiploDelOtro(8);       // uno divide al otro
+        tablaSumaIgualS3(6, 10);
+
+    }
+    
+ 
+
+    // I) PRIMOS (7 métodos)
+    // 1) primo(n) – versión O(√n)
+    public static boolean primo(int n) {
+        if (n <= 1) return false;
+        return primoAux(n, 2);
+    }
+    private static boolean primoAux(int n, int d) {
+        if ((long)d * d > n) return true;
+        if (n % d == 0) return false;
+        return primoAux(n, d + 1);
+    }
+
+    // 2) mostrarPrimos(a, b)
+    public static void mostrarPrimos(int a, int b) {
+        if (a > b) return;
+        if (primo(a)) System.out.print(a + " ");
+        mostrarPrimos(a + 1, b);
+    }
+
+    // 3) cantidadPrimos(a, b)
+    public static int cantidadPrimos(int a, int b) {
+        if (a > b) return 0;
+        return (primo(a) ? 1 : 0) + cantidadPrimos(a + 1, b);
+    }
+
+    // 4) siguientePrimo(n)
+    public static int siguientePrimo(int n) {
+        if (primo(n)) return n;
+        return siguientePrimo(n + 1);
+    }
+
+    // 5) anteriorPrimo(n)
+    public static int anteriorPrimo(int n) {
+        if (n < 2) return -1;
+        if (primo(n)) return n;
+        return anteriorPrimo(n - 1);
+    }
+
+    // 6) iesimoPrimo(i)
+    public static int iesimoPrimo(int i) {
+        return iesimoPrimoAux(i, 2, 0);
+    }
+    private static int iesimoPrimoAux(int i, int cand, int cont) {
+        if (primo(cand)) {
+            if (cont + 1 == i) return cand;
+            return iesimoPrimoAux(i, cand + 1, cont + 1);
+        }
+        return iesimoPrimoAux(i, cand + 1, cont);
+    }
+
+    // 7) mostrarFactoresPrimos(n)
+    public static void mostrarFactoresPrimos(int n) {
+        mostrarFactoresPrimosAux(Math.abs(n), 2);
+    }
+    private static void mostrarFactoresPrimosAux(int n, int f) {
+        if (n <= 1) return;
+        if (n % f == 0) {
+            System.out.print(f + " ");
+            mostrarFactoresPrimosAux(n / f, f);
+        } else {
+            mostrarFactoresPrimosAux(n, f + 1);
+        }
+    }
+
+
+    // II) CADENAS
+    // Aux: seEncuentra(s, ch)
+    public static boolean seEncuentra(String s, char ch) {
+        if (s.isEmpty()) return false;
+        if (s.charAt(0) == ch) return true;
+        return seEncuentra(s.substring(1), ch);
+    }
+
+    // 1) frecuencia(s, ch)
+    public static int frecuencia(String s, char ch) {
+        if (s.isEmpty()) return 0;
+        return (s.charAt(0) == ch ? 1 : 0) + frecuencia(s.substring(1), ch);
+    }
+
+    // 2) estanTodos(s1, s2)
+    public static boolean estanTodos(String s1, String s2) {
+        if (s1.isEmpty()) return true;
+        if (!seEncuentra(s2, s1.charAt(0))) return false;
+        return estanTodos(s1.substring(1), s2);
+    }
+
+    // 3) mismosChar(s1, s2)
+    public static boolean mismosChar(String s1, String s2) {
+        return estanTodos(s1, s2) && estanTodos(s2, s1);
+    }
+
+    // 4) palindrome(s)
+    public static boolean palindrome(String s) {
+        if (s.length() <= 1) return true;
+        if (s.charAt(0) != s.charAt(s.length() - 1)) return false;
+        return palindrome(s.substring(1, s.length() - 1));
+    }
+
+    // 5) existeVocal(s)
+    public static boolean existeVocal(String s) {
+        if (s.isEmpty()) return false;
+        char c = Character.toLowerCase(s.charAt(0));
+        if (c=='a'||c=='e'||c=='i'||c=='o'||c=='u') return true;
+        return existeVocal(s.substring(1));
+    }
+
+    // 6) frecuenciaDigitos(s)
+    public static int frecuenciaDigitos(String s) {
+        if (s.isEmpty()) return 0;
+        return (Character.isDigit(s.charAt(0)) ? 1 : 0) + frecuenciaDigitos(s.substring(1));
+    }
+
+    // 7) ordenado(s) – asc o desc (no estricto)
+    public static boolean ordenado(String s) {
+        return ordenAsc(s) || ordenDesc(s);
+    }
+    private static boolean ordenAsc(String s) {
+        if (s.length() <= 1) return true;
+        if (s.charAt(0) > s.charAt(1)) return false;
+        return ordenAsc(s.substring(1));
+    }
+    private static boolean ordenDesc(String s) {
+        if (s.length() <= 1) return true;
+        if (s.charAt(0) < s.charAt(1)) return false;
+        return ordenDesc(s.substring(1));
+    }
+
+
+    // III) CICLOS ANIDADOS 7 métodos
+    // 1) tabla(n)
+    public static void tabla(int n) { 
+        tablaAux(n, 1, 1);
+    }
+    private static void tablaAux(int n, int i, int j) {
+        if (i > n) return;
+        if (j > n) { tablaAux(n, i + 1, 1); return; }
+        System.out.println(i + " x " + j + " = " + (i * j));
+        tablaAux(n, i, j + 1);
+    }
+
+    // 2) tablaSinRepeticion(n) – i<=j
+    public static void tablaSinRepeticion(int n) {
+        tablaSinRepeticionAux(n, 1, 1); 
+    }
+    private static void tablaSinRepeticionAux(int n, int i, int j) {
+        if (i > n) return;
+        if (j > n) { tablaSinRepeticionAux(n, i + 1, i + 1); return; }
+        System.out.println(i + " x " + j + " = " + (i * j));
+        tablaSinRepeticionAux(n, i, j + 1);
+    }
+
+    // 3) tablaParImpar(n)
+    public static void tablaParImpar(int n) { 
+        tablaParImparAux(n, 1, 1);
+    }
+    private static void tablaParImparAux(int n, int i, int j) {
+        if (i > n) return;
+        if (j > n) { tablaParImparAux(n, i + 1, 1); return; }
+        if ( (i%2==0 && j%2!=0) || (i%2!=0 && j%2==0) ) {
+            System.out.println(i + " x " + j + " = " + (i*j));
+        }
+        tablaParImparAux(n, i, j + 1);
+    }   
+
+    // 4) tablaPares(n)
+    public static void tablaPares(int n) { 
+        tablaParesAux(n, 2, 2); 
+    }
+    private static void tablaParesAux(int n, int i, int j) {
+        if (i > n) return;
+        if (j > n) { tablaParesAux(n, i + 2, 2); return; }
+        System.out.println(i + " x " + j + " = " + (i*j));
+        tablaParesAux(n, i, j + 2);
+    }
+
+    // 5) tablaCoprimos(n) – mcd(i,j)=1
+    public static void tablaCoprimos(int n) { 
+        tablaCoprimosAux(n, 1, 1); 
+    }
+    private static void tablaCoprimosAux(int n, int i, int j) {
+        if (i > n) return;
+        if (j > n) { tablaCoprimosAux(n, i + 1, 1); return; }
+        if (mcd(i, j) == 1) {
+            System.out.println(i + " x " + j + " = " + (i*j));
+        }
+        tablaCoprimosAux(n, i, j + 1);
+    }
+    private static int mcd(int a, int b) { 
+        return (b == 0) ? Math.abs(a) : mcd(b, a % b);
+    }
+
+    // 6) tabla3Factores(n)
+    public static void tabla3Factores(int n) { tabla3FactoresAux(n, 1, 1, 1); }
+    private static void tabla3FactoresAux(int n, int i, int j, int k) {
+        if (i > n) return;
+        if (j > n) { tabla3FactoresAux(n, i + 1, 1, 1); return; }
+        if (k > n) { tabla3FactoresAux(n, i, j + 1, 1); return; }
+        System.out.println(i + " x " + j + " x " + k + " = " + (i*j*k));
+        tabla3FactoresAux(n, i, j, k + 1);
+    }
+
+    // 7) tablaSinRepeticion3(n) – i<=j<=k
+    public static void tablaSinRepeticion3(int n) { tablaSinRepeticion3Aux(n, 1, 1, 1); }
+    private static void tablaSinRepeticion3Aux(int n, int i, int j, int k) {
+        if (i > n) return;
+        if (j > n) { tablaSinRepeticion3Aux(n, i + 1, i + 1, i + 1); return; }
+        if (k > n) { tablaSinRepeticion3Aux(n, i, j + 1, j + 1); return; }
+        if (i <= j && j <= k) {
+            System.out.println(i + " x " + j + " x " + k + " = " + (i*j*k));
+        }
+        tablaSinRepeticion3Aux(n, i, j, k + 1);
+    }
+
+    public static void tablaResultadoIgualA(int n, int k) { tablaResultadoIgualAAux(n, k, 1, 1); }
+    private static void tablaResultadoIgualAAux(int n, int k, int i, int j) {
+        if (i > n) return;
+        if (j > n) { tablaResultadoIgualAAux(n, k, i + 1, 1); return; }
+        if (i * j == k) System.out.println(i + " x " + j + " = " + (i * j));
+        tablaResultadoIgualAAux(n, k, i, j + 1);
+    }
+    
+    public static void tablaProductoMultiploDe(int n, int m) { tablaProductoMultiploDeAux(n, m, 1, 1); }
+    private static void tablaProductoMultiploDeAux(int n, int m, int i, int j) {
+        if (i > n) return;
+        if (j > n) { tablaProductoMultiploDeAux(n, m, i + 1, 1); return; }
+        if ((i * j) % m == 0) System.out.println(i + " x " + j + " = " + (i * j));
+        tablaProductoMultiploDeAux(n, m, i, j + 1);
+    }
+    
+    public static void tablaMismoResiduoMod(int n, int m) { tablaMismoResiduoModAux(n, m, 1, 1); }
+    private static void tablaMismoResiduoModAux(int n, int m, int i, int j) {
+        if (i > n) return;
+        if (j > n) { tablaMismoResiduoModAux(n, m, i + 1, 1); return; }
+        if (i % m == j % m) System.out.println(i + " x " + j + " = " + (i * j));
+        tablaMismoResiduoModAux(n, m, i, j + 1);
+    }
+    
+    public static void tablaUnoMultiploDelOtro(int n) { tablaUnoMultiploDelOtroAux(n, 1, 1); }
+    private static void tablaUnoMultiploDelOtroAux(int n, int i, int j) {
+        if (i > n) return;
+        if (j > n) { tablaUnoMultiploDelOtroAux(n, i + 1, 1); return; }
+        if ((j % i == 0) || (i % j == 0)) System.out.println(i + " x " + j + " = " + (i * j));
+        tablaUnoMultiploDelOtroAux(n, i, j + 1);
+    }
+
+
+    
+    public static void tablaSumaIgualS3(int n, int S) { tablaSumaIgualS3Aux(n, S, 1, 1, 1); }
+    private static void tablaSumaIgualS3Aux(int n, int S, int i, int j, int k) {
+        if (i > n) return;
+        if (j > n) { tablaSumaIgualS3Aux(n, S, i + 1, 1, 1); return; }
+        if (k > n) { tablaSumaIgualS3Aux(n, S, i, j + 1, 1); return; }
+        if (i + j + k == S) System.out.println(i + " x " + j + " x " + k + " = " + (i * j * k));
+        tablaSumaIgualS3Aux(n, S, i, j, k + 1);
+    }
