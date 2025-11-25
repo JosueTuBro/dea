@@ -1,379 +1,347 @@
-System.out.println("PRIMOS");
-// 1) LISTA EN ARREGLO
-        Lista A = new Lista(50);
-
-        //INSERTAR
-        A.insertarPrim(5);
-        A.insertarUlt(9);
-        A.insertarIesimo(7, 1);
-        A.insertarLugarAsc(6);
-        A.insertarLugarDesc(10);
-
-        System.out.println(A);
-
-        // ----- ELIMINAR (5) -----
-        A.eliminarPrim();             
-        A.eliminarUlt();
-        A.eliminarIesimo(1);
-        A.eliminarPrimOcurrencia(5);
-        A.eliminarTodo(7);
-
-        System.out.println(A);
-
-        // 2) LISTA DOBLEMENTE ENCADENADA
-        ListaDoble D = new ListaDoble();
-
-        //INSERTAR
-        D.insertarPrim(5);
-        D.insertarUlt(9);
-        D.insertarIesimo(7, 1);
-        D.insertarLugarAsc(6);
-        D.insertarLugarDes(10);
-        System.out.println(D);
-
-        //ELIMINAR
-        D.eliminarPrim();
-        D.eliminarUlt();
-        D.eliminarIesimo(1);
-        D.eliminarTodo(5);
-        D.eliminarTodo(7);
-        System.out.println(D);
-
-    }
-
 public class Nodo {
-    public Nodo ant, prox;
-    public int elem;
-    
-    public Nodo(int elem, Nodo prox, Nodo ant) { 
-        this.elem = elem; 
-        this.prox = prox; 
-        this.ant = ant; 
+    int valor;
+    int frec;
+    Nodo izq, der;
+
+    public Nodo(int v) {
+        valor = v;
+        frec = 1;
+        izq = der = null;
     }
 }
-    
- 
-public class Lista {
-    private int[] elem;
-    private int cantElem;
-    private int max;
 
-    public Lista(int max) {
-        this.max = max;
-        this.cantElem = 0;
-        this.elem = new int[max];
+Arbol A1 = new Arbol();
+        int[] v1 = {50, 30, 70, 20, 40, 60, 80, 20, 40, 40};
+        for (int x : v1) A1.insertar(x);
+
+        System.out.println(A1);
+        System.out.println(A1.contarNodos());
+        System.out.println(A1.contarHojas());
+        System.out.println(A1.altura());
+        System.out.println(A1.sumaValores());
+        System.out.println(A1.contiene(40));
+
+        System.out.println(A1.frecuenciaDe(40));
+        System.out.println(A1.totalFrecuencia());
+        System.out.println(A1.cantidadDistintos());
+        System.out.println(A1.maxFrecuencia());
+        System.out.println(A1.valorMasFrecuente());
+
+        A1.eliminarPares();
+        System.out.println(A1);
+        A1.eliminarMenor();
+        System.out.println(A1);
+        A1.eliminarMayor();
+        System.out.println(A1);
+        A1.eliminarHojas();
+        System.out.println(A1);
+        A1.eliminar(30);
+        System.out.println(A1);
+
+        ListaArbol L1 = new ListaArbol(10);
+        int[] v2 = {12, 23, 34, 45, 56, 67, 78, 89, 90, 11};
+        for (int x : v2) L1.insertar(x);
+
+        System.out.println(L1);
+        System.out.println(L1.totalElementos());
+        System.out.println(L1.totalDistintos());
+        System.out.println(L1.cantidadArbolesNoVacios());
+        System.out.println(L1.indiceArbolMasGrande());
+        System.out.println(L1.contieneEnLista(45));
+
+public class ListaArbol {
+    private Arbol[] arr;
+
+    public ListaArbol(int n) {
+        arr = new Arbol[n];
+        for (int i = 0; i < n; i++) arr[i] = new Arbol();
     }
-    
-    // toString() iterativo
-    @Override
-    public String toString() {
-        StringBuilder sb = new StringBuilder();
-        sb.append("[");
-        for (int i = 0; i < cantElem; i++) {
-            sb.append(elem[i]);
-            if (i < cantElem - 1) sb.append(",");
+
+    // inserta x según su último dígito (o modulo n)
+    public void insertar(int x) {
+        int pos = Math.abs(x % arr.length);
+        arr[pos].insertar(x);
+    }
+
+    // 1) total elementos (con frecuencia)
+    public int totalElementos() {
+        int t = 0;
+        for (Arbol a : arr) t += a.totalFrecuencia();
+        return t;
+    }
+
+    // 2) total distintos
+    public int totalDistintos() {
+        int t = 0;
+        for (Arbol a : arr) t += a.cantidadDistintos();
+        return t;
+    }
+
+    // 3) cantidad de árboles no vacíos
+    public int cantidadArbolesNoVacios() {
+        int c = 0;
+        for (Arbol a : arr) if (!a.estaVacio()) c++;
+        return c;
+    }
+
+    // 4) índice del árbol con más nodos
+    public int indiceArbolMasGrande() {
+        int mejor = 0, max = -1;
+        for (int i = 0; i < arr.length; i++) {
+            int c = arr[i].contarNodos();
+            if (c > max) { max = c; mejor = i; }
         }
-        sb.append("]");
-        return sb.toString();
-    }
-    
-    
-    
-    
-    //MÉTODOS INSERTAR 
-    public void insertarIesimo(int x, int i) {
-        if (cantElem == max) return;
-        if (i < 0) i = 0;
-        if (i > cantElem) i = cantElem;
-        for (int k = cantElem - 1; k >= i; k--) {
-            elem[k + 1] = elem[k];
-        }
-        elem[i] = x;
-        cantElem++;
+        return mejor;
     }
 
-    public void insertarPrim(int x) {
-        insertarIesimo(x, 0);
+    // 5) ¿x está en la lista?
+    public boolean contieneEnLista(int x) {
+        int pos = Math.abs(x % arr.length);
+        return arr[pos].contiene(x);
     }
 
-    public void insertarUlt(int x) {
-        insertarIesimo(x, cantElem);
-    }
-
-    public void insertarLugarAsc(int x) {
-        if (cantElem == 0 || x <= elem[0]) { insertarIesimo(x, 0); return; }
-        int i;
-        for (i = 0; i < cantElem - 1; i++) {
-            if (x <= elem[i + 1]) break;
-        }
-        insertarIesimo(x, i + 1);
-    }
-
-    public void insertarLugarDesc(int x) {
-        if (cantElem == 0 || x >= elem[0]) { insertarIesimo(x, 0); return; }
-        int i;
-        for (i = 0; i < cantElem - 1; i++) {
-            if (x >= elem[i + 1]) break;
-        }
-        insertarIesimo(x, i + 1);
-    }
-
-    public void concatenar(Lista L2) {
-        for (int i = 0; i < L2.cantElem; i++) {
-            insertarUlt(L2.elem[i]);
-        }
-    }
-
-    public void intercalar(Lista L2, Lista L3) {
-        int i = 0, j = 0;
-        while (i < L2.cantElem || j < L3.cantElem) {
-            if (i < L2.cantElem) insertarUlt(L2.elem[i++]);
-            if (j < L3.cantElem) insertarUlt(L3.elem[j++]);
-        }
-    }
-    
-    
-    
-    
-    //MÉTODOS ELIMINAR
-    public void eliminarIesimo(int i) {
-        if (i < 0 || i >= cantElem) return;
-        for (int k = i; k < cantElem - 1; k++) {
-            elem[k] = elem[k + 1];
-        }
-        cantElem--;
-    }
-
-    public void eliminarPrim() {
-        eliminarIesimo(0);
-    }
-
-    public void eliminarUlt() {
-        if (cantElem > 0) eliminarIesimo(cantElem - 1);
-    }
-
-
-    public void eliminarPrimOcurrencia(int x) {
-        int pos = -1;
-        for (int i = 0; i < cantElem; i++) {
-            if (elem[i] == x) { pos = i; break; }
-        }
-        if (pos == -1) return;
-
-        for (int i = pos; i < cantElem - 1; i++) {
-            elem[i] = elem[i + 1];
-        }
-        cantElem--;
-    }
-
-    // 4) eliminarUltOcurrencia(x)  — sin auxiliares
-    public void eliminarUltOcurrencia(int x) {
-        int pos = -1;
-        for (int i = cantElem - 1; i >= 0; i--) {
-            if (elem[i] == x) { pos = i; break; }
-        }
-        if (pos == -1) return;
-        for (int i = pos; i < cantElem - 1; i++) {
-            elem[i] = elem[i + 1];
-        }
-        cantElem--;
-    }
-
-    public void eliminarTodo(int x) {
-        int k = 0;
-        for (int i = 0; i < cantElem; i++) {
-            if (elem[i] != x) {
-                elem[k++] = elem[i];
-            }
-        }
-        cantElem = k;
-    }
-
-    public void limpiar() {
-        cantElem = 0;
-    }
-   
-}
-
-
-
-
-public class ListaDoble {
-    public Nodo prim, ult;
-    public int cantElem;
-
-    public ListaDoble() { 
-        prim = ult = null; 
-        cantElem = 0; 
-    }
-    public boolean vacia() { 
-        return cantElem == 0; 
-    }
-    
+    // toString de la lista: "[0:[..]-3:[..]-...]"
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder("[");
-        for (Nodo p = prim; p != null; p = p.prox) {
-            sb.append(p.elem);
-            if (p.prox != null) sb.append("-");
+        for (int i = 0; i < arr.length; i++) {
+            if (!arr[i].estaVacio()) {
+                sb.append(i).append(":").append(arr[i].toString());
+                sb.append("-");
+            }
         }
+        if (sb.length() > 1) sb.setLength(sb.length() - 1);
         sb.append("]");
         return sb.toString();
     }
-    
-    
-    //INSERTAR
-    public void insertarPrim(int x) {
-        if (vacia()) {
-            prim = ult = new Nodo(x, null, null);
-        } else {
-            Nodo nuevo = new Nodo(x, prim, null);
-            prim.ant = nuevo;
-            prim = nuevo;
+}
+
+public class Arbol {
+    private Nodo raiz;
+
+    // =========== INSERTAR (con frecuencia) =============
+    public void insertar(int x) {
+        raiz = insertarRec(raiz, x);
+    }
+
+    private Nodo insertarRec(Nodo n, int x) {
+        if (n == null) return new Nodo(x);
+        if (x < n.valor) n.izq = insertarRec(n.izq, x);
+        else if (x > n.valor) n.der = insertarRec(n.der, x);
+        else n.frec++; // repetido -> solo aumenta frecuencia
+        return n;
+    }
+
+    public boolean estaVacio() {
+        return raiz == null;
+    }
+
+    // =========== toString(): "[a-b-c]" =============
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder("[");
+        toStringRec(raiz, sb);
+        if (sb.length() > 1) sb.setLength(sb.length() - 1); // quitar último "-"
+        sb.append("]");
+        return sb.toString();
+    }
+
+    private void toStringRec(Nodo n, StringBuilder sb) {
+        if (n == null) return;
+        toStringRec(n.izq, sb);
+        sb.append(n.valor);
+        if (n.frec > 1) sb.append("(").append(n.frec).append(")");
+        sb.append("-");
+        toStringRec(n.der, sb);
+    }
+
+    // ========== (1) CONSULTAS SOBRE ELEMENTOS (5) =========
+
+    // 1) contiene(x)
+    public boolean contiene(int x) {
+        return contieneRec(raiz, x);
+    }
+
+    private boolean contieneRec(Nodo n, int x) {
+        if (n == null) return false;
+        if (x == n.valor) return true;
+        if (x < n.valor) return contieneRec(n.izq, x);
+        return contieneRec(n.der, x);
+    }
+
+    // 2) contar nodos (distintos)
+    public int contarNodos() {
+        return contarNodosRec(raiz);
+    }
+
+    private int contarNodosRec(Nodo n) {
+        if (n == null) return 0;
+        return 1 + contarNodosRec(n.izq) + contarNodosRec(n.der);
+    }
+
+    // 3) contar hojas
+    public int contarHojas() {
+        return contarHojasRec(raiz);
+    }
+
+    private int contarHojasRec(Nodo n) {
+        if (n == null) return 0;
+        if (n.izq == null && n.der == null) return 1;
+        return contarHojasRec(n.izq) + contarHojasRec(n.der);
+    }
+
+    // 4) altura
+    public int altura() {
+        return alturaRec(raiz);
+    }
+
+    private int alturaRec(Nodo n) {
+        if (n == null) return 0;
+        int ai = alturaRec(n.izq);
+        int ad = alturaRec(n.der);
+        return 1 + (ai > ad ? ai : ad);
+    }
+
+    // 5) suma de valores (ignorando frecuencia)
+    public int sumaValores() {
+        return sumaValoresRec(raiz);
+    }
+
+    private int sumaValoresRec(Nodo n) {
+        if (n == null) return 0;
+        return n.valor + sumaValoresRec(n.izq) + sumaValoresRec(n.der);
+    }
+
+    // ========== (2) CONSULTAS ELIMINANDO ELEMENTOS (5+) =========
+
+    // A1.eliminar(x) (elimina el nodo completo)
+    public void eliminar(int x) {
+        raiz = eliminarRec(raiz, x);
+    }
+
+    private Nodo eliminarRec(Nodo n, int x) {
+        if (n == null) return null;
+        if (x < n.valor) n.izq = eliminarRec(n.izq, x);
+        else if (x > n.valor) n.der = eliminarRec(n.der, x);
+        else {
+            if (n.izq == null) return n.der;
+            if (n.der == null) return n.izq;
+            Nodo min = encontrarMin(n.der);
+            n.valor = min.valor;
+            n.frec  = min.frec;
+            n.der = eliminarRec(n.der, min.valor);
         }
-        cantElem++;
+        return n;
     }
 
-    public void insertarUlt(int x) {
-        if (vacia()) {
-            prim = ult = new Nodo(x, null, null);
-        } else {
-            Nodo nuevo = new Nodo(x, null, ult);
-            ult.prox = nuevo;
-            ult = nuevo;
-        }
-        cantElem++;
+    private Nodo encontrarMin(Nodo n) {
+        while (n != null && n.izq != null) n = n.izq;
+        return n;
     }
 
-    public void insertarIesimo(int x, int i) {
-        if (i <= 0) { insertarPrim(x); return; }
-        if (i >= cantElem) { insertarUlt(x); return; }
-        Nodo p = prim;
-        for (int c = 0; c < i; c++) p = p.prox; // p en pos i
-        Nodo nuevo = new Nodo(x, p, p.ant);
-        p.ant.prox = nuevo;
-        p.ant = nuevo;
-        cantElem++;
+    // eliminar hojas
+    public void eliminarHojas() {
+        raiz = eliminarHojasRec(raiz);
     }
 
-    public void insertarLugarAsc(int x) {
-        if (vacia()) { insertarPrim(x); return; }
-        Nodo p = prim;
-        while (p != null && p.elem < x) p = p.prox;
-        if (p == null) { insertarUlt(x); return; }      // todos < x
-        if (p.ant == null) { insertarPrim(x); return; } // va primero
-        Nodo nuevo = new Nodo(x, p, p.ant);
-        p.ant.prox = nuevo;
-        p.ant = nuevo;
-        cantElem++;
+    private Nodo eliminarHojasRec(Nodo n) {
+        if (n == null) return null;
+        if (n.izq == null && n.der == null) return null;
+        n.izq = eliminarHojasRec(n.izq);
+        n.der = eliminarHojasRec(n.der);
+        return n;
     }
 
-    public void insertarLugarDes(int x) {
-        if (vacia()) { insertarPrim(x); return; }
-        Nodo p = prim;
-        while (p != null && p.elem > x) p = p.prox;
-        if (p == null) { insertarUlt(x); return; }      // todos > x
-        if (p.ant == null) { insertarPrim(x); return; } // va primero
-        Nodo nuevo = new Nodo(x, p, p.ant);
-        p.ant.prox = nuevo;
-        p.ant = nuevo;
-        cantElem++;
+    // eliminar pares
+    public void eliminarPares() {
+        raiz = eliminarParesRec(raiz);
     }
 
-    public void insertarPrim(ListaDoble l2) {
-        if (l2 == null || l2.vacia()) return;
-        if (vacia()) {
-            prim = l2.prim; ult = l2.ult; cantElem = l2.cantElem;
-        } else {
-            l2.ult.prox = prim;
-            prim.ant = l2.ult;
-            prim = l2.prim;
-            cantElem += l2.cantElem;
-        }
+    private Nodo eliminarParesRec(Nodo n) {
+        if (n == null) return null;
+        n.izq = eliminarParesRec(n.izq);
+        n.der = eliminarParesRec(n.der);
+        if (n.valor % 2 == 0) return eliminarRec(n, n.valor);
+        return n;
     }
 
-    public void insertarUlt(ListaDoble l2) {
-        if (l2 == null || l2.vacia()) return;
-        if (vacia()) {
-            prim = l2.prim; ult = l2.ult; cantElem = l2.cantElem;
-        } else {
-            ult.prox = l2.prim;
-            l2.prim.ant = ult;
-            ult = l2.ult;
-            cantElem += l2.cantElem;
-        }
+    // eliminar menor
+    public void eliminarMenor() {
+        if (raiz != null) raiz = eliminarMenorRec(raiz);
     }
 
-
-    //ELIMINAR
-    public void eliminarPrim() {
-        if (vacia()) return;
-        if (prim == ult) { prim = ult = null; }
-        else { prim = prim.prox; prim.ant = null; }
-        cantElem--;
+    private Nodo eliminarMenorRec(Nodo n) {
+        if (n.izq == null) return n.der;
+        n.izq = eliminarMenorRec(n.izq);
+        return n;
     }
 
-    public void eliminarUlt() {
-        if (vacia()) return;
-        if (prim == ult) { prim = ult = null; }
-        else { ult = ult.ant; ult.prox = null; }
-        cantElem--;
+    // eliminar mayor
+    public void eliminarMayor() {
+        if (raiz != null) raiz = eliminarMayorRec(raiz);
     }
 
-    public void eliminarIesimo(int i) {
-        if (i < 0 || i >= cantElem || vacia()) return;
-        Nodo p = prim;
-        for (int c = 0; c < i; c++) p = p.prox;
-        eliminarNodo(p.ant, p);
+    private Nodo eliminarMayorRec(Nodo n) {
+        if (n.der == null) return n.izq;
+        n.der = eliminarMayorRec(n.der);
+        return n;
     }
 
-    // (aux)
-    private Nodo eliminarNodo(Nodo ap, Nodo p) {
-        if (p == null) return (ap == null) ? prim : ap.prox;
-        if (p.ant == null) { eliminarPrim(); return prim; }
-        if (p.prox == null) { eliminarUlt(); return null; }
-        ap.prox = p.prox;
-        p.prox.ant = ap;
-        cantElem--;
-        return ap.prox;
+    // ========== (3) CONSULTAS DE FRECUENCIA (5) =========
+
+    // 1) frecuencia de un valor
+    public int frecuenciaDe(int x) {
+        return frecuenciaDeRec(raiz, x);
     }
 
-    public void eliminarTodo(int x) {
-        Nodo p = prim;
-        while (p != null) {
-            if (p.elem == x) {
-                p = eliminarNodo(p.ant, p);
-            } else {
-                p = p.prox;
-            }
-        }
+    private int frecuenciaDeRec(Nodo n, int x) {
+        if (n == null) return 0;
+        if (x == n.valor) return n.frec;
+        if (x < n.valor) return frecuenciaDeRec(n.izq, x);
+        return frecuenciaDeRec(n.der, x);
     }
 
-    public int frecuencia(int x) {
-        int f = 0; for (Nodo p = prim; p != null; p = p.prox) if (p.elem == x) f++;
-        return f;
-    }
-    public void eliminarUnicos() {
-        Nodo p = prim;
-        while (p != null) {
-            int x = p.elem; Nodo sig = p.prox;
-            if (frecuencia(x) == 1) eliminarNodo(p.ant, p);
-            p = sig;
-        }
+    // 2) total de elementos (sumando frecuencias)
+    public int totalFrecuencia() {
+        return totalFrecuenciaRec(raiz);
     }
 
-    public void eliminarDup() {
-        for (Nodo i = prim; i != null; i = i.prox) {
-            Nodo j = i.prox;
-            while (j != null) {
-                if (j.elem == i.elem) j = eliminarNodo(j.ant, j);
-                else j = j.prox;
-            }
-        }
+    private int totalFrecuenciaRec(Nodo n) {
+        if (n == null) return 0;
+        return n.frec + totalFrecuenciaRec(n.izq) + totalFrecuenciaRec(n.der);
     }
 
-    public void eliminar(ListaDoble l2) {
-        if (l2 == null || l2.vacia() || vacia()) return;
-        for (Nodo q = l2.prim; q != null; q = q.prox) eliminarTodo(q.elem);
+    // 3) cantidad de valores distintos
+    public int cantidadDistintos() {
+        return contarNodos();
+    }
+
+    // 4) máxima frecuencia
+    public int maxFrecuencia() {
+        return maxFrecuenciaRec(raiz);
+    }
+
+    private int maxFrecuenciaRec(Nodo n) {
+        if (n == null) return 0;
+        int iz = maxFrecuenciaRec(n.izq);
+        int de = maxFrecuenciaRec(n.der);
+        int mayorHijos = (iz > de) ? iz : de;
+        return (n.frec > mayorHijos) ? n.frec : mayorHijos;
+    }
+
+    // 5) valor más frecuente
+    public int valorMasFrecuente() {
+        Nodo mejor = valorMasFrecuenteRec(raiz);
+        return (mejor == null) ? 0 : mejor.valor;
+    }
+
+    private Nodo valorMasFrecuenteRec(Nodo n) {
+        if (n == null) return null;
+        Nodo iz = valorMasFrecuenteRec(n.izq);
+        Nodo de = valorMasFrecuenteRec(n.der);
+        Nodo mejor = n;
+        if (iz != null && iz.frec > mejor.frec) mejor = iz;
+        if (de != null && de.frec > mejor.frec) mejor = de;
+        return mejor;
     }
 }
